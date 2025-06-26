@@ -1,10 +1,6 @@
-use k256::{
-    ProjectivePoint,
-    NonZeroScalar,
-};
+use k256::{NonZeroScalar, ProjectivePoint};
 use p256::elliptic_curve::Group;
 use rand::rngs::ThreadRng;
-use rand::RngCore;
 
 /// Generate a random scalar for secp256k1
 pub fn random_scalar(rng: &mut ThreadRng) -> NonZeroScalar {
@@ -30,13 +26,13 @@ pub fn multiply_random_point(point: &ProjectivePoint, scalar: &NonZeroScalar) ->
 pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
     use std::time::Instant;
     let mut rng = rand::thread_rng();
-    
+
     // Pre-generate all scalars to ensure timing only measures the multiplication
     let scalars: Vec<NonZeroScalar> = (0..iterations).map(|_| random_scalar(&mut rng)).collect();
-    
+
     // Measure individual operations and collect times
     let mut times = Vec::with_capacity(iterations);
-    
+
     for scalar in &scalars {
         let start = Instant::now();
         let _result = multiply_generator(scalar);
@@ -44,12 +40,18 @@ pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
         // Convert to milliseconds
         times.push(duration.as_micros() as f64 / 1000.0);
     }
-    
+
     // Calculate statistics
     let avg = times.iter().sum::<f64>() / times.len() as f64;
-    let min = *times.iter().min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
-    let max = *times.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
-    
+    let min = *times
+        .iter()
+        .min_by(|a, b| a.partial_cmp(b).unwrap())
+        .unwrap();
+    let max = *times
+        .iter()
+        .max_by(|a, b| a.partial_cmp(b).unwrap())
+        .unwrap();
+
     (avg, min, max)
 }
 
@@ -57,14 +59,14 @@ pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
 pub fn bench_random_point_multiplication(iterations: usize) -> (f64, f64, f64) {
     use std::time::Instant;
     let mut rng = rand::thread_rng();
-    
+
     // Pre-generate all points and scalars
     let points: Vec<ProjectivePoint> = (0..iterations).map(|_| random_point(&mut rng)).collect();
     let scalars: Vec<NonZeroScalar> = (0..iterations).map(|_| random_scalar(&mut rng)).collect();
-    
+
     // Measure individual operations and collect times
     let mut times = Vec::with_capacity(iterations);
-    
+
     for i in 0..iterations {
         let start = Instant::now();
         let _result = multiply_random_point(&points[i], &scalars[i]);
@@ -72,11 +74,17 @@ pub fn bench_random_point_multiplication(iterations: usize) -> (f64, f64, f64) {
         // Convert to milliseconds
         times.push(duration.as_micros() as f64 / 1000.0);
     }
-    
+
     // Calculate statistics
     let avg = times.iter().sum::<f64>() / times.len() as f64;
-    let min = *times.iter().min_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
-    let max = *times.iter().max_by(|a, b| a.partial_cmp(b).unwrap()).unwrap();
-    
+    let min = *times
+        .iter()
+        .min_by(|a, b| a.partial_cmp(b).unwrap())
+        .unwrap();
+    let max = *times
+        .iter()
+        .max_by(|a, b| a.partial_cmp(b).unwrap())
+        .unwrap();
+
     (avg, min, max)
 }

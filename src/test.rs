@@ -2,18 +2,17 @@
 mod tests {
     use elgamal_p256::algebra::groups::inst::pfec_group_p256;
     use elgamal_p256::algebra::groups::inst::pfec_group_p256::Inimportat32point;
-    use p256::{
-        elliptic_curve::{
-            bigint::Encoding, sec1::ToEncodedPoint, Group, Field
-        }, EncodedPoint, Scalar, U256, ProjectivePoint
-    };
-    use rand::Rng; 
     use num::bigint::{BigInt, Sign};
+    use p256::{
+        EncodedPoint, ProjectivePoint, Scalar, U256,
+        elliptic_curve::{Field, Group, bigint::Encoding, sec1::ToEncodedPoint},
+    };
+    use rand::Rng;
 
     #[test]
     fn benchmark_scalar_multiplication_performance() {
         use std::time::Instant;
-        
+
         // --- SETUP ---
         const NUM_ITERATIONS: u32 = 1000;
         let mut rng = rand::thread_rng();
@@ -21,23 +20,27 @@ mod tests {
         // Initialize duration trackers
         let mut pfec_total_duration = std::time::Duration::new(0, 0);
         let mut rust_crypto_total_duration = std::time::Duration::new(0, 0);
-        
+
         // Get the generator points for both implementations
         let generator_pfec = &pfec_group_p256::g;
         let generator_rust_crypto = ProjectivePoint::generator();
 
-        println!("\n--- Running Scalar Multiplication Benchmark ({} iterations) ---", NUM_ITERATIONS);
+        println!(
+            "\n--- Running Scalar Multiplication Benchmark ({} iterations) ---",
+            NUM_ITERATIONS
+        );
 
         for _i in 0..NUM_ITERATIONS {
             // --- 1. Generate a common random exponent for this iteration ---
-            
+
             let random_scalar = Scalar::random(&mut rng);
             let exponent_bigint = random_pfec_scalar(&random_scalar);
 
             // --- 2. Time the `pfec_group_p256` implementation ---
-            
+
             let start_pfec = Instant::now();
-            let result_pfec = pfec_group_p256::in_import_at__32_scmul(&exponent_bigint, generator_pfec);
+            let result_pfec =
+                pfec_group_p256::in_import_at__32_scmul(&exponent_bigint, generator_pfec);
             pfec_total_duration += start_pfec.elapsed();
 
             // --- 3. Time the `p256` (rust-crypto) implementation ---
@@ -46,7 +49,7 @@ mod tests {
             // The idiomatic way to do scalar multiplication in the rust-crypto crates is with the `*` operator
             let result_rust_crypto = generator_rust_crypto * random_scalar;
             rust_crypto_total_duration += start_rust_crypto.elapsed();
-            
+
             // --- 4. (Optional but recommended) Verify results match to ensure we're timing the same operation ---
             // Only assert on the first run to avoid overhead in the benchmark loop
             let (x_pfec_raw, y_pfec_raw) = match result_pfec {
@@ -87,19 +90,38 @@ mod tests {
             let x_bytes_be_: [u8; 32] = x_bigint.to_be_bytes();
             let y_bytes_be_: [u8; 32] = y_bigint.to_be_bytes();
 
-            assert_eq!(x_pfec_bytes, x_bytes_be_.to_vec(), "X coordinates do not match!");
-            assert_eq!(y_pfec_bytes, y_bytes_be_.to_vec(), "Y coordinates do not match!");
+            assert_eq!(
+                x_pfec_bytes,
+                x_bytes_be_.to_vec(),
+                "X coordinates do not match!"
+            );
+            assert_eq!(
+                y_pfec_bytes,
+                y_bytes_be_.to_vec(),
+                "Y coordinates do not match!"
+            );
             // println!("{:?} {:?}", sign_x, sign_y);
-
         }
 
         // --- 5. Print the results ---
         println!("\n--- Benchmark Results ---");
-        println!("Total time for `pfec_group_p256` implementation: {:?}", pfec_total_duration);
-        println!("Total time for `p256` (rust-crypto) implementation: {:?}", rust_crypto_total_duration);
+        println!(
+            "Total time for `pfec_group_p256` implementation: {:?}",
+            pfec_total_duration
+        );
+        println!(
+            "Total time for `p256` (rust-crypto) implementation: {:?}",
+            rust_crypto_total_duration
+        );
         println!("\nAverage time per operation:");
-        println!("  - `pfec_group_p256`: {:?}", pfec_total_duration / NUM_ITERATIONS);
-        println!("  - `p256` (rust-crypto): {:?}", rust_crypto_total_duration / NUM_ITERATIONS);
+        println!(
+            "  - `pfec_group_p256`: {:?}",
+            pfec_total_duration / NUM_ITERATIONS
+        );
+        println!(
+            "  - `p256` (rust-crypto): {:?}",
+            rust_crypto_total_duration / NUM_ITERATIONS
+        );
 
         let pfec_micros = pfec_total_duration.as_micros() as f64;
         let rust_crypto_micros = rust_crypto_total_duration.as_micros() as f64;
@@ -115,7 +137,7 @@ mod tests {
         let bv = elgamal_p256::dword::DWord::from_u128(240, random_number);
         pfec_group_p256::in_import_at__32_enc_bits_inst_sz_sz(240, 15, bv.as_ref())
     }
-    
+
     fn random_pfec_scalar(random_scalar: &Scalar) -> BigInt {
         // Convert the p256::Scalar to a num::BigInt for the pfec implementation
         let scalar_bytes = random_scalar.to_bytes(); // This is a GenericArray
