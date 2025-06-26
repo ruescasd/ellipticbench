@@ -12,9 +12,10 @@ pub fn random_scalar(rng: &mut ThreadRng) -> Scalar {
 
 // generating a random point by try and increment encoding is not uniform but we don't care
 pub fn random_point() -> Inimportat32point {
-    let bigint = generate_random_bigint_up_to(240);
-    let bv = elgamal_p256::dword::DWord::from_int(240, &bigint);
-    pfec_group_p256::in_import_at__32_enc_bits_inst_sz_sz(240, 15, bv.as_ref())
+    let bigint = generate_random_bigint_up_to(247);
+    let bv = elgamal_p256::dword::DWord::from_int(247, &bigint);
+    pfec_group_p256::enc(bv.as_ref())
+    // pfec_group_p256::in_import_at__32_enc_bits_inst_sz_sz(242, 15, bv.as_ref())
 }
 
 pub fn multiply_generator(exponent: BigInt) -> Inimportat32point {
