@@ -10,9 +10,8 @@ mod utils;
 use utils::format_result;
 
 fn main() {
-    println!("Elliptic Curve Point Multiplication Benchmark");
+
     println!("=============================================");
-    println!();
 
     let iterations = 1000;
     println!("Running benchmarks with {} iterations each...", iterations);
