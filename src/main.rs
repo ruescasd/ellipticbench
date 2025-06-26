@@ -10,7 +10,6 @@ mod utils;
 use utils::format_result;
 
 fn main() {
-
     println!("=============================================");
 
     let iterations = 1000;
