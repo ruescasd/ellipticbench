@@ -2,8 +2,6 @@ use p384::elliptic_curve::Group;
 use p384::{NonZeroScalar, ProjectivePoint};
 use rand::rngs::ThreadRng;
 
-use cpu_time::ProcessTime;
-
 pub fn random_scalar(rng: &mut ThreadRng) -> NonZeroScalar {
     NonZeroScalar::random(rng)
 }
@@ -27,7 +25,7 @@ pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
     let mut times = Vec::with_capacity(iterations);
 
     for scalar in &scalars {
-        let start = ProcessTime::now();
+        let start = crate::utils::now();
         let _result = multiply_generator(scalar);
         let duration = start.elapsed();
         times.push(duration.as_micros() as f64 / 1000.0);
@@ -54,7 +52,7 @@ pub fn bench_random_point_multiplication(iterations: usize) -> (f64, f64, f64) {
     let mut times = Vec::with_capacity(iterations);
 
     for i in 0..iterations {
-        let start = ProcessTime::now();
+        let start = crate::utils::now();
         let _result = multiply_random_point(&points[i], &scalars[i]);
         let duration = start.elapsed();
         times.push(duration.as_micros() as f64 / 1000.0);

@@ -37,14 +37,14 @@ mod tests {
 
             // --- 2. Time the `pfec_group_p256` implementation ---
 
-            let start_pfec = ProcessTime::now();
+            let start_pfec = crate::utils::now();
             let result_pfec =
                 pfec_group_p256::in_import_at__32_scmul(&exponent_bigint, generator_pfec);
             pfec_total_duration += start_pfec.elapsed();
 
             // --- 3. Time the `p256` (rust-crypto) implementation ---
 
-            let start_rust_crypto = ProcessTime::now();
+            let start_rust_crypto = crate::utils::now();
             // The idiomatic way to do scalar multiplication in the rust-crypto crates is with the `*` operator
             let result_rust_crypto = generator_rust_crypto * random_scalar;
             rust_crypto_total_duration += start_rust_crypto.elapsed();

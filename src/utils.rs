@@ -65,3 +65,18 @@ pub fn format_result(
         pfec_ratio
     )
 }
+
+use cpu_time::ProcessTime;
+pub fn now() -> ProcessTime {
+    ProcessTime::now()
+}
+
+/*
+Using cpu_time on windows returns timings at 15.625ms which breaks the benchmarks.
+Use this on windows
+*/
+/*
+use std::time::Instant;
+pub fn now() -> Instant {
+    Instant::now()
+}*/

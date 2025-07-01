@@ -6,8 +6,6 @@ use p256::elliptic_curve::Field;
 use rand::RngCore;
 use rand::rngs::ThreadRng;
 
-use cpu_time::ProcessTime;
-
 pub fn random_scalar(rng: &mut ThreadRng) -> Scalar {
     Scalar::random(rng)
 }
@@ -40,7 +38,7 @@ pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
 
     for scalar in &scalars {
         let exponent_bigint = random_pfec_scalar(scalar);
-        let start = ProcessTime::now();
+        let start = crate::utils::now();
         let _result = multiply_generator(exponent_bigint);
         let duration = start.elapsed();
         times.push(duration.as_micros() as f64 / 1000.0);
@@ -67,7 +65,7 @@ pub fn bench_random_point_multiplication(iterations: usize) -> (f64, f64, f64) {
 
     for i in 0..iterations {
         let exponent_bigint = random_pfec_scalar(&scalars[i]);
-        let start = ProcessTime::now();
+        let start = crate::utils::now();
         let _result = multiply_random_point(&points[i], exponent_bigint);
         let duration = start.elapsed();
         times.push(duration.as_micros() as f64 / 1000.0);

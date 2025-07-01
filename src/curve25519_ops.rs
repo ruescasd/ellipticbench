@@ -2,8 +2,6 @@ use curve25519_dalek::ristretto::RistrettoPoint;
 use curve25519_dalek::scalar::Scalar;
 use rand::rngs::ThreadRng;
 
-use cpu_time::ProcessTime;
-
 /// Generate a random scalar for Curve25519
 pub fn random_scalar(rng: &mut ThreadRng) -> Scalar {
     /*let mut bytes = [0u8; 32];
@@ -38,7 +36,7 @@ pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
     let mut times = Vec::with_capacity(iterations);
 
     for scalar in &scalars {
-        let start = ProcessTime::now();
+        let start = crate::utils::now();
         let _result = multiply_generator(scalar);
         let duration = start.elapsed();
         // Convert to milliseconds
@@ -71,7 +69,7 @@ pub fn bench_random_point_multiplication(iterations: usize) -> (f64, f64, f64) {
     let mut times = Vec::with_capacity(iterations);
 
     for i in 0..iterations {
-        let start = ProcessTime::now();
+        let start = crate::utils::now();
         let _result = multiply_random_point(&points[i], &scalars[i]);
         let duration = start.elapsed();
         // Convert to milliseconds
