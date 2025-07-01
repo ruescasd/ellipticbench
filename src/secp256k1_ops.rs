@@ -2,6 +2,8 @@ use k256::{NonZeroScalar, ProjectivePoint};
 use p256::elliptic_curve::Group;
 use rand::rngs::ThreadRng;
 
+use cpu_time::ProcessTime;
+
 /// Generate a random scalar for secp256k1
 pub fn random_scalar(rng: &mut ThreadRng) -> NonZeroScalar {
     NonZeroScalar::random(rng)
@@ -24,7 +26,6 @@ pub fn multiply_random_point(point: &ProjectivePoint, scalar: &NonZeroScalar) ->
 
 /// Run a benchmark for generator point multiplication
 pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
-    use std::time::Instant;
     let mut rng = rand::thread_rng();
 
     // Pre-generate all scalars to ensure timing only measures the multiplication
@@ -34,7 +35,7 @@ pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
     let mut times = Vec::with_capacity(iterations);
 
     for scalar in &scalars {
-        let start = Instant::now();
+        let start = ProcessTime::now();
         let _result = multiply_generator(scalar);
         let duration = start.elapsed();
         // Convert to milliseconds
@@ -57,7 +58,6 @@ pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
 
 /// Run a benchmark for random point multiplication
 pub fn bench_random_point_multiplication(iterations: usize) -> (f64, f64, f64) {
-    use std::time::Instant;
     let mut rng = rand::thread_rng();
 
     // Pre-generate all points and scalars
@@ -68,7 +68,7 @@ pub fn bench_random_point_multiplication(iterations: usize) -> (f64, f64, f64) {
     let mut times = Vec::with_capacity(iterations);
 
     for i in 0..iterations {
-        let start = Instant::now();
+        let start = ProcessTime::now();
         let _result = multiply_random_point(&points[i], &scalars[i]);
         let duration = start.elapsed();
         // Convert to milliseconds

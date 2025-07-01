@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+    use cpu_time::ProcessTime;
     use elgamal_p256::algebra::groups::inst::pfec_group_p256;
     use elgamal_p256::algebra::groups::inst::pfec_group_p256::Inimportat32point;
     use num::bigint::{BigInt, Sign};
@@ -11,8 +12,6 @@ mod tests {
 
     #[test]
     fn benchmark_scalar_multiplication_performance() {
-        use std::time::Instant;
-
         // --- SETUP ---
         const NUM_ITERATIONS: u32 = 1000;
         let mut rng = rand::thread_rng();
@@ -38,14 +37,14 @@ mod tests {
 
             // --- 2. Time the `pfec_group_p256` implementation ---
 
-            let start_pfec = Instant::now();
+            let start_pfec = ProcessTime::now();
             let result_pfec =
                 pfec_group_p256::in_import_at__32_scmul(&exponent_bigint, generator_pfec);
             pfec_total_duration += start_pfec.elapsed();
 
             // --- 3. Time the `p256` (rust-crypto) implementation ---
 
-            let start_rust_crypto = Instant::now();
+            let start_rust_crypto = ProcessTime::now();
             // The idiomatic way to do scalar multiplication in the rust-crypto crates is with the `*` operator
             let result_rust_crypto = generator_rust_crypto * random_scalar;
             rust_crypto_total_duration += start_rust_crypto.elapsed();

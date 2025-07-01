@@ -14,5 +14,4 @@ p521 = "0.13"
 p384 = "0.13"
 elgamal_p256 = { path = "deps/elgamal_p256" }
 num = "0.4.0"
-
-
+cpu-time = "1.0.0"

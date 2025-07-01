@@ -6,6 +6,8 @@ use p256::elliptic_curve::Field;
 use rand::RngCore;
 use rand::rngs::ThreadRng;
 
+use cpu_time::ProcessTime;
+
 pub fn random_scalar(rng: &mut ThreadRng) -> Scalar {
     Scalar::random(rng)
 }
@@ -32,14 +34,13 @@ fn random_pfec_scalar(random_scalar: &Scalar) -> BigInt {
 }
 
 pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
-    use std::time::Instant;
     let mut rng = rand::thread_rng();
     let scalars: Vec<Scalar> = (0..iterations).map(|_| random_scalar(&mut rng)).collect();
     let mut times = Vec::with_capacity(iterations);
 
     for scalar in &scalars {
         let exponent_bigint = random_pfec_scalar(scalar);
-        let start = Instant::now();
+        let start = ProcessTime::now();
         let _result = multiply_generator(exponent_bigint);
         let duration = start.elapsed();
         times.push(duration.as_micros() as f64 / 1000.0);
@@ -59,7 +60,6 @@ pub fn bench_generator_multiplication(iterations: usize) -> (f64, f64, f64) {
 }
 
 pub fn bench_random_point_multiplication(iterations: usize) -> (f64, f64, f64) {
-    use std::time::Instant;
     let mut rng = rand::thread_rng();
     let points: Vec<Inimportat32point> = (0..iterations).map(|_| random_point()).collect();
     let scalars: Vec<Scalar> = (0..iterations).map(|_| random_scalar(&mut rng)).collect();
@@ -67,7 +67,7 @@ pub fn bench_random_point_multiplication(iterations: usize) -> (f64, f64, f64) {
 
     for i in 0..iterations {
         let exponent_bigint = random_pfec_scalar(&scalars[i]);
-        let start = Instant::now();
+        let start = ProcessTime::now();
         let _result = multiply_random_point(&points[i], exponent_bigint);
         let duration = start.elapsed();
         times.push(duration.as_micros() as f64 / 1000.0);
